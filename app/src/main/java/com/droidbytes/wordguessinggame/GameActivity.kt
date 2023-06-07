@@ -31,11 +31,11 @@ class GameActivity : AppCompatActivity() {
         answerList = ArrayList()
 
         hashMap = HashMap<String, String>()
-//        hashMap.put("A rhythmic movement to music", "Dance")
-//        hashMap.put("An expression of happiness or joy", "Smile")
-//        hashMap.put("A sandy shore by the sea or a lake", "Beach")
-//        hashMap.put("The state of resting or slumbering", "sleep")
-//        hashMap.put(" A written or printed work of literature or reference", "Book")
+        hashMap.put("A rhythmic movement to music", "Dance")
+        hashMap.put("An expression of happiness or joy", "Smile")
+        hashMap.put("A sandy shore by the sea or a lake", "Beach")
+        hashMap.put("The state of resting or slumbering", "sleep")
+        hashMap.put(" A written or printed work of literature or reference", "Book")
         val entries = hashMap.entries.shuffled()
 
         timer()
