@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "309804341713",
+    "project_id": "wordguessinggame-e69f7",
+    "storage_bucket": "wordguessinggame-e69f7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:309804341713:android:dc586f70d80c227d1668f0",
+        "android_client_info": {
+          "package_name": "com.droidbytes.wordguessinggame"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "309804341713-nbbupg70dir9uq8gec948bfbuped37h7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa2XCzUKyL46CGHko4mWdjqS444qIge8w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "309804341713-nbbupg70dir9uq8gec948bfbuped37h7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

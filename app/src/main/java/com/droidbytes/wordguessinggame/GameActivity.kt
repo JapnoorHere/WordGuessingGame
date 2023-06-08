@@ -4,79 +4,169 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
 import android.view.View
-import android.view.ViewGroup
-import android.widget.EditText
-import androidx.cardview.widget.CardView
-import androidx.core.view.marginEnd
+import androidx.core.widget.doOnTextChanged
 import com.droidbytes.wordguessinggame.databinding.ActivityGameBinding
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class GameActivity : AppCompatActivity() {
     lateinit var binding: ActivityGameBinding
     var questionCount: Int = 0
     var answer: String = ""
-    var solved: Int = -1
+    var correct: Int = 0
     var currentAnswer: String = ""
-    lateinit var hintList: ArrayList<String>
+    lateinit var questionList: ArrayList<String>
     lateinit var answerList: ArrayList<String>
+
+    lateinit var questionListOld: ArrayList<String>
+    lateinit var answerListOld: ArrayList<String>
+
+
     lateinit var countDownTimer: CountDownTimer
     lateinit var hashMap: HashMap<String, String>
     var remaining: Int = 0
+    lateinit var questionRef: DatabaseReference
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGameBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        hintList = ArrayList()
+        questionRef = FirebaseDatabase.getInstance().reference.child("question")
+        questionList = ArrayList()
         answerList = ArrayList()
+        questionListOld = ArrayList()
+        answerListOld = ArrayList()
+        hashMap= HashMap()
+        questionListOld=intent.getStringArrayListExtra("questions") as ArrayList
+        answerListOld=intent.getStringArrayListExtra("answers") as ArrayList
 
-        hashMap = HashMap<String, String>()
-        hashMap.put("A rhythmic movement to music", "Dance")
-        hashMap.put("An expression of happiness or joy", "Smile")
-        hashMap.put("A sandy shore by the sea or a lake", "Beach")
-        hashMap.put("The state of resting or slumbering", "sleep")
-        hashMap.put(" A written or printed work of literature or reference", "Book")
+//
+        
+
+        for(each in 0..questionListOld.size-1){
+            hashMap[questionListOld[each]]=answerListOld[each]
+        }
+
         val entries = hashMap.entries.shuffled()
 
         timer()
 
         for (each in entries) {
-            hintList.add(each.key)
+            questionList.add(each.key)
             answerList.add(each.value)
         }
-        remaining = hintList.size
+        remaining = 15
         updateAnswerAndQuestion()
 
+        binding.et1.doOnTextChanged { text, start, before, count ->
+            if(!binding.et1.text.toString().isEmpty()){
+                binding.et2.requestFocus()
+            }
+            if(!binding.et2.text.toString().isEmpty()){
+                binding.et2.requestFocus()
+            }
+        }
+
+        binding.et2.doOnTextChanged { text, start, before, count ->
+            if(!binding.et2.text.toString().isEmpty()){
+                binding.et3.requestFocus()
+            }
+            else{
+                binding.et1.requestFocus()
+            }
+
+        }
+        binding.et3.doOnTextChanged { text, start, before, count ->
+            if(!binding.et3.text.toString().isEmpty()){
+                binding.et4.requestFocus()
+            }
+            else{
+                binding.et2.requestFocus()
+            }
+
+        }
+        binding.et4.doOnTextChanged { text, start, before, count ->
+            if(!binding.et4.text.toString().isEmpty()){
+                binding.et5.requestFocus()
+            }
+            else{
+                binding.et3.requestFocus()
+            }
+
+        }
+        binding.et5.doOnTextChanged { text, start, before, count ->
+            if(!binding.et5.text.toString().isEmpty()){
+                binding.et6.requestFocus()
+            }
+            else{
+                binding.et4.requestFocus()
+            }
+
+        }
+        binding.et6.doOnTextChanged { text, start, before, count ->
+            if (binding.et6.text.toString().isEmpty()) {
+                binding.et5.requestFocus()
+            }
+        }
 
         binding.nextbtn.setOnClickListener {
+            answer = binding.et1.text.toString() +
+                    binding.et2.text.toString() +
+                    binding.et3.text.toString() +
+                    binding.et4.text.toString() +
+                    binding.et5.text.toString() +
+                    binding.et6.text.toString()
             if (remaining == 1) {
-                var intent= Intent(this@GameActivity,ResultActivity::class.java)
-                intent.putExtra("solved",solved.toString())
-                startActivity(intent)
+                if(currentAnswer.equals(answer, ignoreCase = true)) {
+                    correct++
+                    binding.solvedtv.setText(correct.toString())
+                    var intent = Intent(this@GameActivity, ResultActivity::class.java)
+                    intent.putExtra("solved", correct.toString())
+                    startActivity(intent)
+                }
+                else{
+                    var intent = Intent(this@GameActivity, ResultActivity::class.java)
+                    intent.putExtra("solved", correct.toString())
+                    startActivity(intent)
+                }
             } else {
-                answer = binding.et1.text.toString() +
-                        binding.et2.text.toString() +
-                        binding.et3.text.toString() +
-                        binding.et4.text.toString() +
-                        binding.et5.text.toString() +
-                        binding.et6.text.toString()
-                println(hashMap.get(binding.hintTv.text.toString()))
-                println(
-                    hashMap.get(binding.hintTv.text.toString()).equals(answer, ignoreCase = true)
-                )
+                println(currentAnswer.equals(answer, ignoreCase = true))
                 println(answer)
-                if (hashMap.get(binding.hintTv.text.toString()).equals(answer, ignoreCase = true)) {
-                    remaining -= 1
-                    solved++
-                    binding.solvedtv.setText(solved.toString())
+                if (currentAnswer.equals(answer, ignoreCase = true)) {
                     countDownTimer.cancel()
-                    updateAnswerAndQuestion()
-                    timer()
+                    binding.lottie.visibility=View.VISIBLE
+                    binding.lottie.setAnimation("correct.json")
+                    binding.lottie.playAnimation()
+                    var handler = Handler()
+                    handler.postDelayed({
+                        binding.lottie.visibility=View.GONE
+                        remaining -= 1
+                        correct++
+                        binding.solvedtv.setText(correct.toString())
+                        countDownTimer.cancel()
+                        updateAnswerAndQuestion()
+                        timer()
+                    },2000)
+
                 } else {
-                    remaining -= 1
                     countDownTimer.cancel()
-                    timer()
-                    updateAnswerAndQuestion()
+                    binding.lottie.visibility=View.VISIBLE
+                    binding.lottie.setAnimation("wrong.json")
+                    binding.lottie.playAnimation()
+                    var handler=Handler()
+                    handler.postDelayed({
+                        // Hide the Lottie animation view
+                        binding.lottie.visibility=View.GONE
+                        remaining -= 1
+                        countDownTimer.cancel()
+                        timer()
+                        updateAnswerAndQuestion()
+                    }, 2000)
+
                 }
             }
         }
@@ -85,10 +175,10 @@ class GameActivity : AppCompatActivity() {
 
     fun updateAnswerAndQuestion() {
         binding.remainingTv.text = remaining.toString()
-        binding.hintTv.text = hintList[questionCount]
+        binding.hintTv.text = questionList[questionCount].uppercase(Locale.getDefault())
         currentAnswer = answerList[questionCount]
         questionCount += 1
-        if (questionCount >= hintList.size) {
+        if (questionCount >= questionList.size) {
             questionCount = 0
         }
 
@@ -160,8 +250,24 @@ class GameActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                updateAnswerAndQuestion()
-                timer()
+                if(remaining==1){
+                    var intent = Intent(this@GameActivity, ResultActivity::class.java)
+                    intent.putExtra("solved", correct.toString())
+                    startActivity(intent)
+                }
+                else {
+                    binding.lottie.visibility=View.VISIBLE
+                    binding.lottie.setAnimation("wrong.json")
+                    binding.lottie.playAnimation()
+                    var handler=Handler()
+                    handler.postDelayed({
+                        // Hide the Lottie animation view
+                        binding.lottie.visibility=View.GONE
+                        remaining -= 1
+                        timer()
+                        updateAnswerAndQuestion()
+                    }, 2000)
+                }
             }
         }
         countDownTimer.start()
