@@ -1,10 +1,12 @@
 package com.droidbytes.wordguessinggame
 
 import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.AssetFileDescriptor
+import android.content.res.AssetManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.WindowManager
@@ -13,17 +15,80 @@ import com.droidbytes.wordguessinggame.databinding.DialogInstructionsBinding
 import com.google.firebase.database.*
 
 class MainActivity : AppCompatActivity() {
-    lateinit var binding: ActivityMainBinding
-    lateinit var questionRef: DatabaseReference
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var questionRef: DatabaseReference
     lateinit var questionArrayList: ArrayList<String>
     lateinit var answerArrayList: ArrayList<String>
+    lateinit var clickMediaPlayer : MediaPlayer
+    private lateinit var assetManager : AssetManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val intent = Intent(this, MusicService::class.java)
+        startService(intent)
         questionArrayList = ArrayList()
         answerArrayList = ArrayList()
         questionRef = FirebaseDatabase.getInstance().reference.child("question")
+        assetManager = applicationContext.assets
+        binding.startGame.setOnClickListener {
+            val musicFileName = "clickButton.mp3"
+            val descriptor: AssetFileDescriptor = assetManager.openFd(musicFileName)
+            clickMediaPlayer = MediaPlayer()
+            clickMediaPlayer.setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
+            clickMediaPlayer.prepare()
+            clickMediaPlayer.start()
+            questionRef.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (each in snapshot.children) {
+                        var value = each.getValue(QuestionAnswer::class.java)
+                        questionArrayList.add(value?.key.toString())
+                        answerArrayList.add(value?.value.toString())
+                    }
+                    var dialog= Dialog(this@MainActivity)
+                    var dialogbind = DialogInstructionsBinding.inflate(layoutInflater)
+                    dialog.setContentView(dialogbind.root)
+                    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                    dialog.window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.WRAP_CONTENT)
+                    dialogbind.startGame.setOnClickListener {
+                        clickMediaPlayer = MediaPlayer()
+                        clickMediaPlayer.setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
+                        clickMediaPlayer.prepare()
+                        clickMediaPlayer.start()
+                        dialog.dismiss()
+                        var intent = Intent(this@MainActivity, GameActivity::class.java)
+                        intent.putExtra("questions", questionArrayList)
+                        intent.putExtra("answers", answerArrayList)
+                        startActivity(intent)
+                    }
+                    dialog.show()
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+        }
+    }
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val musicFileName = "clickButton.mp3"
+        val descriptor: AssetFileDescriptor = assetManager.openFd(musicFileName)
+        clickMediaPlayer = MediaPlayer()
+        clickMediaPlayer.setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
+        clickMediaPlayer.prepare()
+        clickMediaPlayer.start()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val intent = Intent(this, MusicService::class.java)
+        stopService(intent)
+    }
+}
+
+
 //        var hashMap = HashMap<String, String>()
 //        hashMap["A rhythmic movement to music"] = "Dance"
 //        hashMap["An expression of happiness or joy"] = "Smile"
@@ -116,33 +181,7 @@ class MainActivity : AppCompatActivity() {
 //            questionRef.child(questionRef.push().key.toString()).setValue(each)
 //
 //        }
-        binding.startGame.setOnClickListener {
-            questionRef.addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (each in snapshot.children) {
-                        var value = each.getValue(QuestionAnswer::class.java)
-                        questionArrayList.add(value?.key.toString())
-                        answerArrayList.add(value?.value.toString())
-                    }
-                    var dialog= Dialog(this@MainActivity)
-                    var dialogbind = DialogInstructionsBinding.inflate(layoutInflater)
-                    dialog.setContentView(dialogbind.root)
-                    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                    dialog.window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.WRAP_CONTENT)
-                    dialogbind.startGame.setOnClickListener {
-                        dialog.dismiss()
-                        var intent = Intent(this@MainActivity, GameActivity::class.java)
-                        intent.putExtra("questions", questionArrayList)
-                        intent.putExtra("answers", answerArrayList)
-                        startActivity(intent)
-                    }
-                    dialog.show()
-                }
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
 
-            })
-        }
-    }
-}
+
+
+

@@ -17,7 +17,6 @@
         android:id="@+id/lottie"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        android:visibility="gone"
         app:lottie_fileName="words.json"
         android:layout_gravity="center"
         android:scaleType="fitXY"
@@ -25,7 +24,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#3CBB86FC" />
+        android:background="#80F4EE8F" />
 
     <Button
         android:id="@+id/startGame"
@@ -35,9 +34,22 @@
         android:background="@drawable/button_bg"
         android:padding="20dp"
         android:text="@string/start_game"
-        android:textColor="@color/purple"
+        android:textColor="@color/purple_200"
         android:textSize="20sp"
         app:backgroundTint="@null" />
+ <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WORD GUESSING\nGAME"
+        android:textColor="@color/purple_200"
+        android:textSize="40sp"
+        android:layout_marginTop="150dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:gravity="center"
+        android:fontFamily="@font/cute"
+        android:textStyle="bold"
+         />
 
 </RelativeLayout>
 </layout>

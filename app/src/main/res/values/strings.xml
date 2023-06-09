@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">WordGuessingGame</string>
+    <string name="app_name">Word Guessing Game</string>
     <string name="start_game">START GAME</string>
 </resources>

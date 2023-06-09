@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="#3CBB86FC"
+        android:background="#fffccf"
         tools:context=".GameActivity">
 
         <androidx.cardview.widget.CardView
@@ -24,7 +24,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Remaining :  "
-                    android:textColor="#4E4E4E"
+                    android:textColor="#fffccf"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -45,7 +45,7 @@
                     android:layout_weight="1"
                     android:gravity="end"
                     android:text="Correct :   "
-                    android:textColor="#4E4E4E"
+                    android:textColor="#fffccf"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -108,11 +108,12 @@
                 />
 
             <LinearLayout
-                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
+                android:layout_marginTop="10dp"
                 android:gravity="center">
+
 
                 <EditText
                     android:id="@+id/et1"
@@ -233,7 +234,8 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
-                android:backgroundTint="#b68aec"
+                android:backgroundTint="@color/purple_200"
+                app:tint="@color/white"
                 android:src="@drawable/baseline_arrow_forward_24" />
 
         </RelativeLayout>
