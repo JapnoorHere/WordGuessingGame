@@ -128,12 +128,16 @@ class GameActivity : AppCompatActivity() {
                     correct++
                     binding.solvedtv.setText(correct.toString())
                     var intent = Intent(this@GameActivity, ResultActivity::class.java)
-                    intent.putExtra("solved", correct.toString())
+                    intent.putExtra("result", correct.toString())
+                    intent.putExtra("questions", questionList)
+                    intent.putExtra("answers", answerList)
                     startActivity(intent)
                     finish()
                 } else {
                     var intent = Intent(this@GameActivity, ResultActivity::class.java)
-                    intent.putExtra("solved", correct.toString())
+                    intent.putExtra("result", correct.toString())
+                    intent.putExtra("questions", questionList)
+                    intent.putExtra("answers", answerList)
                     startActivity(intent)
                     finish()
                 }
@@ -262,7 +266,9 @@ class GameActivity : AppCompatActivity() {
                 override fun onFinish() {
                     if (remaining == 1) {
                         var intent = Intent(this@GameActivity, ResultActivity::class.java)
-                        intent.putExtra("solved", correct.toString())
+                        intent.putExtra("result", correct.toString())
+                        intent.putExtra("questions", questionList)
+                        intent.putExtra("answers", answerList)
                         startActivity(intent)
                         finish()
                     } else {

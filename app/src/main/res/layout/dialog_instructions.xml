@@ -10,8 +10,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="20dp"
-    app:cardCornerRadius="10dp"
-        app:cardBackgroundColor="#F7F5DB"
+    app:cardCornerRadius="20dp"
+        app:cardBackgroundColor="@color/purple_200"
         >
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,7 +25,7 @@
             android:text=" Instructions"
             android:drawableLeft="@drawable/instructions"
             android:layout_gravity="center"
-            android:textColor="@color/black"
+            android:textColor="#F7F5DB"
             android:textSize="30sp"
             android:textStyle="bold"
             android:layout_marginBottom="10dp"
@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1. There will be total 15 questions.\n2. Every question consists of 1 point.\n3. There will be only 30 seconds to answer a question."
-            android:textColor="@color/black"
+            android:textColor="#F7F5DB"
             android:textSize="20sp"
             />
 
@@ -48,8 +48,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginEnd="10dp"
-            android:backgroundTint="@color/purple_200"
-            app:tint="@color/white"
+            android:backgroundTint="#F7F5DB"
+            app:tint="@color/black"
             android:src="@drawable/baseline_arrow_forward_24"
             />
 
