@@ -1,6 +1,8 @@
 package com.droidbytes.wordguessinggame
 
 import android.content.Intent
+import android.content.SharedPreferences
+import android.content.SharedPreferences.Editor
 import android.content.res.AssetFileDescriptor
 import android.content.res.AssetManager
 import android.media.MediaPlayer
@@ -28,12 +30,14 @@ class GameActivity : AppCompatActivity() {
     private var isbuttonClickable: Boolean = true
     private lateinit var questionListOld: ArrayList<String>
     private lateinit var answerListOld: ArrayList<String>
-    private lateinit var clickMediaPlayer : MediaPlayer
+    private lateinit var clickMediaPlayer: MediaPlayer
     private lateinit var countDownTimer: CountDownTimer
     private lateinit var hashMap: HashMap<String, String>
     var remaining: Int = 0
     private lateinit var questionRef: DatabaseReference
-    private lateinit var assetManager : AssetManager
+    private lateinit var assetManager: AssetManager
+    lateinit var sharedPreferences: SharedPreferences
+    lateinit var editor: Editor
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGameBinding.inflate(layoutInflater)
@@ -47,7 +51,10 @@ class GameActivity : AppCompatActivity() {
         questionListOld = intent.getStringArrayListExtra("questions") as ArrayList
         answerListOld = intent.getStringArrayListExtra("answers") as ArrayList
         assetManager = applicationContext.assets
-
+        sharedPreferences=applicationContext.getSharedPreferences("score", MODE_PRIVATE)
+        editor=sharedPreferences.edit()
+        var bestScore = sharedPreferences.getString("bestScore","0")
+        binding.bestScore.text="Your Best Score : $bestScore"
         for (each in 0..questionListOld.size - 1) {
             hashMap[questionListOld[each]] = answerListOld[each]
         }
@@ -114,7 +121,11 @@ class GameActivity : AppCompatActivity() {
             val musicFileName = "clickButton.mp3"
             val descriptor: AssetFileDescriptor = assetManager.openFd(musicFileName)
             clickMediaPlayer = MediaPlayer()
-            clickMediaPlayer.setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
+            clickMediaPlayer.setDataSource(
+                descriptor.fileDescriptor,
+                descriptor.startOffset,
+                descriptor.length
+            )
             clickMediaPlayer.prepare()
             clickMediaPlayer.start()
             answer = binding.et1.text.toString() +
@@ -182,120 +193,129 @@ class GameActivity : AppCompatActivity() {
 
                     }
                 }
-                }
             }
-
         }
 
-        fun updateAnswerAndQuestion() {
-            binding.remainingTv.text = remaining.toString()
-            binding.hintTv.text = questionList[questionCount].uppercase(Locale.getDefault())
-            currentAnswer = answerList[questionCount]
-            questionCount += 1
-            if (questionCount >= questionList.size) {
-                questionCount = 0
-            }
+    }
 
-            println(currentAnswer.length)
-            when (currentAnswer.length) {
-                1 -> {
-                    binding.et1.visibility = View.VISIBLE
-                    binding.et2.visibility = View.GONE
-                    binding.et3.visibility = View.GONE
-                    binding.et4.visibility = View.GONE
-                    binding.et5.visibility = View.GONE
-                    binding.et6.visibility = View.GONE
-                }
-                2 -> {
-                    binding.et1.visibility = View.VISIBLE
-                    binding.et2.visibility = View.VISIBLE
-                    binding.et3.visibility = View.GONE
-                    binding.et4.visibility = View.GONE
-                    binding.et5.visibility = View.GONE
-                    binding.et6.visibility = View.GONE
-                }
-                3 -> {
-                    binding.et1.visibility = View.VISIBLE
-                    binding.et2.visibility = View.VISIBLE
-                    binding.et3.visibility = View.VISIBLE
-                    binding.et4.visibility = View.GONE
-                    binding.et5.visibility = View.GONE
-                    binding.et6.visibility = View.GONE
-                }
-                4 -> {
-                    binding.et1.visibility = View.VISIBLE
-                    binding.et2.visibility = View.VISIBLE
-                    binding.et3.visibility = View.VISIBLE
-                    binding.et4.visibility = View.VISIBLE
-                    binding.et5.visibility = View.GONE
-                    binding.et6.visibility = View.GONE
-                }
-                5 -> {
-                    binding.et1.visibility = View.VISIBLE
-                    binding.et2.visibility = View.VISIBLE
-                    binding.et3.visibility = View.VISIBLE
-                    binding.et4.visibility = View.VISIBLE
-                    binding.et5.visibility = View.VISIBLE
-                    binding.et6.visibility = View.GONE
-                }
-                6 -> {
-                    binding.et1.visibility = View.VISIBLE
-                    binding.et2.visibility = View.VISIBLE
-                    binding.et3.visibility = View.VISIBLE
-                    binding.et4.visibility = View.VISIBLE
-                    binding.et5.visibility = View.VISIBLE
-                    binding.et6.visibility = View.VISIBLE
-                }
-            }
-            binding.et1.text.clear()
-            binding.et2.text.clear()
-            binding.et3.text.clear()
-            binding.et4.text.clear()
-            binding.et5.text.clear()
-            binding.et6.text.clear()
-            binding.et1.requestFocus()
+    fun updateAnswerAndQuestion() {
+        binding.remainingTv.text = remaining.toString()
+        binding.hintTv.text = questionList[questionCount].uppercase(Locale.getDefault())
+        currentAnswer = answerList[questionCount]
+        questionCount += 1
+        if (questionCount >= questionList.size) {
+            questionCount = 0
         }
 
-        fun timer() {
-            countDownTimer = object : CountDownTimer(30000, 1000) {
-                override fun onTick(millisUntilFinished: Long) {
-                    val secondsLeft = millisUntilFinished / 1000
-                    binding.timerTv.text = secondsLeft.toString()
-                }
+        println(currentAnswer.length)
+        when (currentAnswer.length) {
+            1 -> {
+                binding.et1.visibility = View.VISIBLE
+                binding.et2.visibility = View.GONE
+                binding.et3.visibility = View.GONE
+                binding.et4.visibility = View.GONE
+                binding.et5.visibility = View.GONE
+                binding.et6.visibility = View.GONE
+            }
 
-                override fun onFinish() {
-                    if (remaining == 1) {
-                        var intent = Intent(this@GameActivity, ResultActivity::class.java)
-                        intent.putExtra("result", correct.toString())
-                        intent.putExtra("questions", questionList)
-                        intent.putExtra("answers", answerList)
-                        startActivity(intent)
-                        finish()
-                    } else {
-                        binding.lottie.visibility = View.VISIBLE
-                        binding.lottie.setAnimation("wrong.json")
-                        binding.lottie.playAnimation()
-                        var handler = Handler()
-                        handler.postDelayed({
-                            // Hide the Lottie animation view
-                            binding.lottie.visibility = View.GONE
-                            remaining -= 1
-                            timer()
-                            updateAnswerAndQuestion()
-                        }, 2000)
-                    }
+            2 -> {
+                binding.et1.visibility = View.VISIBLE
+                binding.et2.visibility = View.VISIBLE
+                binding.et3.visibility = View.GONE
+                binding.et4.visibility = View.GONE
+                binding.et5.visibility = View.GONE
+                binding.et6.visibility = View.GONE
+            }
+
+            3 -> {
+                binding.et1.visibility = View.VISIBLE
+                binding.et2.visibility = View.VISIBLE
+                binding.et3.visibility = View.VISIBLE
+                binding.et4.visibility = View.GONE
+                binding.et5.visibility = View.GONE
+                binding.et6.visibility = View.GONE
+            }
+
+            4 -> {
+                binding.et1.visibility = View.VISIBLE
+                binding.et2.visibility = View.VISIBLE
+                binding.et3.visibility = View.VISIBLE
+                binding.et4.visibility = View.VISIBLE
+                binding.et5.visibility = View.GONE
+                binding.et6.visibility = View.GONE
+            }
+
+            5 -> {
+                binding.et1.visibility = View.VISIBLE
+                binding.et2.visibility = View.VISIBLE
+                binding.et3.visibility = View.VISIBLE
+                binding.et4.visibility = View.VISIBLE
+                binding.et5.visibility = View.VISIBLE
+                binding.et6.visibility = View.GONE
+            }
+
+            6 -> {
+                binding.et1.visibility = View.VISIBLE
+                binding.et2.visibility = View.VISIBLE
+                binding.et3.visibility = View.VISIBLE
+                binding.et4.visibility = View.VISIBLE
+                binding.et5.visibility = View.VISIBLE
+                binding.et6.visibility = View.VISIBLE
+            }
+        }
+        binding.et1.text.clear()
+        binding.et2.text.clear()
+        binding.et3.text.clear()
+        binding.et4.text.clear()
+        binding.et5.text.clear()
+        binding.et6.text.clear()
+        binding.et1.requestFocus()
+    }
+
+    fun timer() {
+        countDownTimer = object : CountDownTimer(30000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsLeft = millisUntilFinished / 1000
+                binding.timerTv.text = secondsLeft.toString()
+            }
+
+            override fun onFinish() {
+                if (remaining == 1) {
+                    var intent = Intent(this@GameActivity, ResultActivity::class.java)
+                    intent.putExtra("result", correct.toString())
+                    intent.putExtra("questions", questionList)
+                    intent.putExtra("answers", answerList)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    binding.lottie.visibility = View.VISIBLE
+                    binding.lottie.setAnimation("wrong.json")
+                    binding.lottie.playAnimation()
+                    var handler = Handler()
+                    handler.postDelayed({
+                        // Hide the Lottie animation view
+                        binding.lottie.visibility = View.GONE
+                        remaining -= 1
+                        timer()
+                        updateAnswerAndQuestion()
+                    }, 2000)
                 }
             }
-            countDownTimer.start()
         }
+        countDownTimer.start()
+    }
 
     override fun onBackPressed() {
         super.onBackPressed()
         val musicFileName = "clickButton.mp3"
         val descriptor: AssetFileDescriptor = assetManager.openFd(musicFileName)
         clickMediaPlayer = MediaPlayer()
-        clickMediaPlayer.setDataSource(descriptor.fileDescriptor, descriptor.startOffset, descriptor.length)
+        clickMediaPlayer.setDataSource(
+            descriptor.fileDescriptor,
+            descriptor.startOffset,
+            descriptor.length
+        )
         clickMediaPlayer.prepare()
         clickMediaPlayer.start()
     }
-    }
+}

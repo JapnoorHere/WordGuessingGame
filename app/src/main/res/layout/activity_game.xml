@@ -108,8 +108,9 @@
                 />
 
             <LinearLayout
+                android:id="@+id/etLL"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_marginTop="10dp"
                 android:gravity="center">
@@ -223,8 +224,32 @@
                     app:cardBackgroundColor="#1A1D2E"
                     app:cardCornerRadius="30dp" />
 
-
             </LinearLayout>
+
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_marginStart="70dp"
+                android:layout_marginEnd="70dp"
+                app:cardBackgroundColor="@color/purple_200"
+                app:cardCornerRadius="20dp"
+                android:layout_alignTop="@id/etLL"
+                android:layout_marginTop="150dp"
+                >
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Your Best Score : 15"
+                    android:id="@+id/bestScore"
+                    android:textColor="#fffccf"
+                    android:textSize="22sp"
+                    android:padding="10dp"
+                    android:gravity="center"
+                    android:textStyle="italic"
+                    />
+            </androidx.cardview.widget.CardView>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/nextbtn"
