@@ -17,19 +17,23 @@ import com.google.firebase.database.*
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var questionRef: DatabaseReference
-    lateinit var questionArrayList: ArrayList<String>
-    lateinit var answerArrayList: ArrayList<String>
-    lateinit var clickMediaPlayer : MediaPlayer
+    private lateinit var questionArrayList: ArrayList<String>
+    private lateinit var answerArrayList: ArrayList<String>
+    private lateinit var clickMediaPlayer : MediaPlayer
     private lateinit var assetManager : AssetManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val intent = Intent(this, MusicService::class.java)
-        startService(intent)
+
+        questionRef = FirebaseDatabase.getInstance().reference.child("question")
+
         questionArrayList = ArrayList()
         answerArrayList = ArrayList()
-        questionRef = FirebaseDatabase.getInstance().reference.child("question")
+
+        val intent = Intent(this, MusicService::class.java)
+        startService(intent)
+
         assetManager = applicationContext.assets
         binding.startGame.setOnClickListener {
             val musicFileName = "clickButton.mp3"
